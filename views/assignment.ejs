@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Page</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <!-- Header Section with Course Name and Assignment Name -->
+    <div class="bg-primary text-white text-center py-4 mb-4">
+        <h1 class="h4 mb-1"><%= assignment.courseName %> / <%= assignment.assignmentName %></h1>
+        <p class="mb-0">Assignment Description: <%= assignment.description %></p>
+    </div>
+
+    <div class="container">
+        <!-- Assignment Details Section -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Assignment: <%= assignment.assignmentName %></h5>
+                <p class="card-text text-danger">Time Remaining: <%= assignment.timeRemaining %></p>
+            </div>
+        </div>
+
+        <!-- Students List Section for Submitted Students -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h2 class="h6 mb-0">Students Who Submitted</h2>
+            </div>
+            <ul class="list-group list-group-flush">
+                <% if (submittedStudents.length > 0) { %>
+                    <% submittedStudents.forEach(student => { %>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><%= student["Name"] %></span>
+                            <span class="badge <%= student.status === 'Graded' ? 'bg-success' : 'bg-warning' %>">
+                                <%= student.status %>
+                            </span>
+                            <div>
+                                <% if (student.status === 'Graded') { %>
+                                    <button class="btn btn-sm btn-outline-info me-2">View Marks</button>
+                                <% } else { %>
+                                    <button class="btn btn-sm btn-outline-primary me-2">Assign Marks</button>
+                                <% } %>
+                                <button class="btn btn-sm btn-outline-secondary">View Details</button>
+                            </div>
+                        </li>
+                    <% }) %>
+                <% } else { %>
+                    <li class="list-group-item text-center">No submissions made.</li>
+                <% } %>
+            </ul>
+        </div>
+
+        <!-- Students List Section for Not Submitted Students -->
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h2 class="h6 mb-0">Students Who Have Not Submitted</h2>
+            </div>
+            <ul class="list-group list-group-flush">
+                <% if (notSubmittedStudents.length > 0) { %>
+                    <% notSubmittedStudents.forEach(student => { %>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><%= student["Name"]%></span>
+                            <span class="badge bg-danger">Not Submitted</span>
+                            <button class="btn btn-sm btn-outline-warning">Send Reminder</button>
+                        </li>
+                    <% }) %>
+                <% } else { %>
+                    <li class="list-group-item text-center">No students available for this assignment.</li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

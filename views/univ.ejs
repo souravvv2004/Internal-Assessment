@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>University Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .card-img-top {
+      object-fit: cover; /* Ensures the image covers the area without distorting */
+    }
+    h1 {
+      text-align: center;
+      font-size: 3rem; 
+      color: #257cd3; 
+      text-transform: uppercase; 
+      letter-spacing: 2px; 
+      font-weight: bold;
+      margin-top: 50px; 
+      padding: 10px 0;
+      
+    }
+    .row{
+
+      display:flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-bottom: 5%;
+      margin-top: 5%;
+    }
+    body{
+      /* background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%); */
+    }
+    .card{
+      text-align: center;
+    }
+
+    
+  </style>
+</head>
+<body>
+
+  <h1>University Portal</h1>
+  <div class="container">
+    <div class="row">
+      <!-- Card 1 -->
+      <div class="col-md-2 mb-4">
+        <div class="card" style="width: 18rem;">
+          <img class="card-img-top" src="images/503.png" alt="Card image cap">
+          <div class="card-body">
+          
+            <a href="/univ/createUser" class="btn btn-primary">Create Student&Teachers</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="col-md-4 mb-4">
+        <div class="card" style="width: 18rem;">
+          <img class="card-img-top" src="images/course.png" alt="Card image cap">
+          <div class="card-body">
+            
+            <a href="/univ/courses" class="btn btn-primary">Create Courses</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+   <div class="row" style="justify-content:center;">
+    <div class="col-md-6 mb-8">
+      <div class="card" style="width: 28rem;">
+        <img style=" transform: scale(1); object-position: center;" class="card-img-top" src="images/courseAllot.jpg" alt="Card image cap">
+        <div class="card-body">
+       
+          
+          <a href="/univ/courseAllot" class="btn btn-primary">Allot Courses</a>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

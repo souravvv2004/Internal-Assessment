@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher's Portal</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      margin-top: 60px;
+    }
+    .navbar-profile {
+      display: flex;
+      align-items: center;
+    }
+    .navbar-profile img {
+      border-radius: 50%;
+      margin-left: 10px;
+      width: 40px;
+      height: 40px;
+    }
+    .courses, .assignments {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Teacher's Portal</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
+          </li>
+          <li class="nav-item navbar-profile">
+            <span class="text-light"><%= teacher.Name %></span> <!-- Teacher's name passed from backend -->
+            <!-- <img src= alt="Profile Photo"> -->
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Courses Section -->
+  <div class="container courses">
+    <h2>Courses</h2>
+    <div class="row">
+      <% if (courses.length>0) { %>
+      <% courses.forEach(course => { %>   <!--Courses array pass from backend-->
+        <div class="col-md-4">
+          <div class="card">
+            <!-- <img src="<%# course.image %>" class="card-img-top" alt="Course Image"> -->
+            <div class="card-body">
+              <h3 class="card-title"><%= course["courseID"] %></h3>
+              <h5 class="card-text"><%= course["courseName"] %></h5>
+              <a href="/courses" class="btn btn-primary">View Course</a>
+            </div>
+          </div>
+        </div>
+       
+         
+        <% }) %>
+        <% } else { %>
+          <p>No Courses have been Alloted.</p>
+        <% } %>
+    </div>
+  </div>
+
+  <!-- Assignments Section -->
+  <div class="container assignments">
+    <h2>Assignments</h2>
+    <div class="row">
+      <!-- Form for creating new assignments -->
+      <div class="col-md-12">
+        <h5>Create a New Assignment</h5>
+        <form action="/login/course/create" method="POST" target="_self"  enctype="multipart/form-data">
+          <input hidden  id="createdBY" name="createdBy" value="<%=teacher.teacherID%>"/>
+          <div class="mb-3">
+            <label for="assignmentName" class="form-label">Title</label>
+            <input type="text" class="form-control" id="assignmentName" name="assignmentName" required>
+          </div>
+          <div class="mb-3">
+            <!-- For Selecting Course -->
+            <label for="subjectCode" class="form-label">Select The Course</label>
+            <select class="form-select"  name="subjectCode" id="subjectCode" required>
+              <option selected>Select Course</option>
+              <% courses.forEach(course => { %>
+                
+                <option value="<%=course["courseID"] %>"><%=course["courseName"]%></option>
+              <% }) %>
+                
+
+            </select>
+            <!-- For Uploading File -->
+            <div class="mb-3">
+              <label for="formFileSm" class="form-label">Upload File(If Neccessary)</label>
+              <input class="form-control form-control-sm" id="formFileSm" name="formFileSm" type="file">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="assignmentDescription" class="form-label">Description</label>
+            <textarea class="form-control" id="assignmentDescription" name="content" rows="3" ></textarea>
+          </div>
+          <div class="mb-3">
+          <label for="deadline">Deadline-Date</label>
+          <input type="datetime-local" id="deadline" name="endDate">
+          </div>
+          <div class="mb-3">
+          <input type="number" name="maxMarks" min="0" max="200" placeholder="Max Marks"/>  
+          </div>
+          <button type="submit" class="btn btn-primary">Create Assignment</button>
+        </form>
+      </div>
+
+      <!-- List of assignments -->
+      <div class="col-md-12">
+        <h5>Posted Assignments</h5>
+        <ol class="list-group">
+          <% if (assignments.length>0) { %>
+           
+          
+          <% assignments.forEach(assignment => { %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <strong><%= assignment.assignmentName %></strong><br>
+                <small>Deadline: <%= new Date(assignment.endDate).toLocaleDateString("en-US", {
+                  year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+                }) %></small>
+              </div>
+              <span class="badge bg-primary rounded-pill">
+                Status: 
+                <% if (new Date(assignment.endDate) > new Date()) { %>
+                  Pending
+                <% } else { %>
+                  Due
+                <% } %>
+              </span>
+              <a href="/assignment/<%= assignment.assignmentID %>" class="btn btn-info">View Details</a>
+            </li>
+        
+            
+            <% }) %>
+            <% } else { %>
+              <p>No pending assignments.</p>
+              <% } %>
+             
+        </ol>
+      </div>
+      
+      
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+
+    
+  </script>
+</body>
+</html>
