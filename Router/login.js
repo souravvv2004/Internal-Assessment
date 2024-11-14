@@ -84,8 +84,8 @@ app.route("/")
     else if(id=="ADMIN"){
 
         const user = await admin.findOne({ adminID: id });
-        console.log("Admin is ",user);
-        if(user.password==generateHashToken(req.body.password)){
+
+        if(user.Password==generateHashToken(req.body.password)){
             const cokkieVal = jwt.sign(JSON.stringify(user), "SECRET");
             res.cookie("session", cokkieVal);
 

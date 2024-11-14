@@ -22,7 +22,7 @@ const url=process.env.MONGODB_URI;
 // Login the Student
 
 app.use(express.static(path.join(__dirname, 'public')));
-mongoose.connect(url)
+mongoose.connect(url,{dbName:"IA_PROJECT"})
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
@@ -56,7 +56,7 @@ app.use("/forgot", password);
 app.use("/assignment", assingment);
 
 // Make the server listen on IPv6 only
-app.listen(80,  () => {
+app.listen(3000,  () => {
     console.log("Url is ",url,"",typeof(url))
     console.log("Server running on localhost and Port", PORT);
 });
