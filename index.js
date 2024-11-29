@@ -7,6 +7,7 @@ const univRouter = require("./Router/univ.js");
 const password = require("./Router/password-reset.js");
 const loginRoute=require("./Router/login.js");
 const assingment=require("./Router/assingment.js")
+const submission=require("./Router/submission.js")
 const cookieParser = require('cookie-parser'); 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
@@ -22,7 +23,7 @@ const url=process.env.MONGODB_URI;
 // Login the Student
 
 app.use(express.static(path.join(__dirname, 'public')));
-mongoose.connect(url,{dbName:"IA_PROJECT"})
+mongoose.connect(url,)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
@@ -37,7 +38,7 @@ app.get('/Views/:file', (req, res) => {
     res.render(file); // This will look for views/forgot-password.ejs
 });
 
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 
@@ -54,9 +55,10 @@ app.use("/login",loginRoute);
 app.use("/univ", univRouter);
 app.use("/forgot", password);
 app.use("/assignment", assingment);
+app.use("/submission",submission);
 
 // Make the server listen on IPv6 only
 app.listen(3000,  () => {
-    console.log("Url is ",url,"",typeof(url))
+    console.log("Url is ",url,"",typeof(url)),
     console.log("Server running on localhost and Port", PORT);
 });

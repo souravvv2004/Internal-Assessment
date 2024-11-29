@@ -14,6 +14,8 @@ var transporter = nodemailer.createTransport({
       user: email,
       pass: PASSKEY
   }});
+
+
 async function generateuserID(role) {
     console.log("Inside The Function");
     if(role == "Teacher"){
@@ -28,25 +30,42 @@ async function generateuserID(role) {
     }
 }
 
+
+//--------------------------------------------------------------------------------------------------------------------------------------
+//                                                      For Rendering Univ Page
+//
+//---------------------------------------------------------------------------------------------------------------------------------------
 router.get("/", (req, res) => {
     res.render("univ");
 });
-router.get("/createUser",(req,res)=>{
-    res.render("createUser.ejs")
+//--------------------------------------------------------------------------------------------------------------------------------------
+//                                                      For Handling Teacher and Student Creation
+//
+//---------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+router.route("/createUser")
+.get((req,res)=>{
+    res.render("createUser.ejs");
 })
 
-router.post("/createUser", async (req, res) => {
+
+
+
+.post(async (req, res) => {
     try {
-        console.log("Received Input: ", req.body);
+       
         const role = req.body.role;
         delete req.body.role;
         
-        console.log("\nProcessed Input: ", req.body);
+       
         
-        const userID = await generateuserID(role); // Await the generated user ID
+        const userID = await generateuserID(role); 
         const body = req.body;
         
-        console.log("Generated ID: ", userID);
+       
 
         if(role == "Teacher"){
             var teacherID=userID;
@@ -56,13 +75,26 @@ router.post("/createUser", async (req, res) => {
             });
             
             await newTeacher.save(); // Save the teacher record
-            console.log("Teacher created successfully");
-
+          
+            console.log("Teacher ID is ",studentID);
             var mailOptions = {
                 from: "sourabhmadaan31@gmail.com",
                 to: newTeacher.Email,
-                subject: '<h2>Registering Email</h2>',
-                text: `Welcome to the Organization! Your unique Teacher ID is: ${teacherID}`
+                subject: 'Registering Email',
+                text: `<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;"><h2 style="color: #4CAF50; ">Welcome to Our Organization!</h2>
+                <p>Dear <strong>${req.body.Name}</strong>,</p>
+                <p>Welcome to the organization! We are thrilled to have you on board as part of our team.</p>
+                <p><strong>Your unique Teacher ID is:</strong> <span style="color: #007BFF;">${teacherID}</span></p>
+                <p>To set up your password and access the Teacher Module, please follow these steps:</p>
+                <ol>
+                    <li>Go to the <strong>Teacher Module</strong>.</li>
+                    <li>Click on <strong>"Forgot Password"</strong> to initiate the password setup process.</li>
+                </ol>
+                <p>If you have any questions or require assistance, please don’t hesitate to reach out to our support team.</p>
+                <p>We’re excited to work with you and wish you great success ahead!</p>
+                <br>
+                
+                <p><strong>All the best for your upcoming journey</strong></p></body>`
             };
 
             transporter.sendMail(mailOptions, function(error, info){
@@ -82,13 +114,26 @@ router.post("/createUser", async (req, res) => {
                 ...body
             });
             await newStudent.save(); // Save the student record
-            console.log("Student created successfully");
+            console.log("Student ID is ",studentID);
 
             var mailOptions = {
                 from: "sourabhmadaan31@gmail.com",
                 to: newStudent.Email,
                 subject: '<h2>Registering Email</h2>',
-                text: `Welcome to the Organization! Your unique Student ID is: ${studentID}`
+                text: `<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;"><h2 >Welcome to Our Organization!</h2>
+                <p>Dear <strong>${req.body.Name}</strong>,</p>
+                <p>Welcome to the organization! We are thrilled to have you on board as part of our team.</p>
+                <p><strong>Your unique Teacher ID is:</strong> <span style="color: #007BFF;">${studentID}</span></p>
+                <p>To set up your password and access the Teacher Module, please follow these steps:</p>
+                <ol>
+                    <li>Go to the <strong>Teacher Module</strong>.</li>
+                    <li>Click on <strong>"Forgot Password"</strong> to initiate the password setup process.</li>
+                </ol>
+                <p>If you have any questions or require assistance, please don’t hesitate to reach out to our support team.</p>
+                <p>We’re excited to work with you and wish you great success ahead!</p>
+                <br>
+                
+                <p><strong>All the best for your upcoming journey</strong></p></body>`
             };
 
             transporter.sendMail(mailOptions, function(error, info){
@@ -109,8 +154,13 @@ router.post("/createUser", async (req, res) => {
 });
 
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//                                  Making an API For Fetching Course Base on entered USer ID
+//---------------------------------------------------------------------------------------------------------------------------------------
+//                                
+//                                    Making an API For Fetching Course Base on entered USer ID
+//
+//---------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 router.get("/courseAlloted/:userID", async (req, res) => {
   
@@ -172,10 +222,12 @@ router.get("/courseAlloted/:userID", async (req, res) => {
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-//For Creating Courses
-
-router.route("/courses")
+//--------------------------------------------------------------------------------------------------------------------------------------
+//                                                        
+//                                                        For Creating Courses
+//
+//--------------------------------------------------------------------------------------------------------------------------------------
+router.route("/courses")    
 
 .get((req,res)=>{
     res.render("courses.ejs");
@@ -211,8 +263,12 @@ router.route("/courses")
 
 })
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//                                              For Selecting and Updating Course
+//--------------------------------------------------------------------------------------------------------------------------------------
+//                                                        
+//                                                        For Allotting Courses
+//
+//--------------------------------------------------------------------------------------------------------------------------------------
+
 
 router.route("/courseAllot")
 .get(async(req,res)=>{
