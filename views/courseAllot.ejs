@@ -10,7 +10,7 @@
 <body>
     <!-- Enter ID -->
     <div class="input-group input-group-sm mb-3">
-        <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="userID" name="userID" placeholder="Enter Teacher ID or Student ID">
+        <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="userID" name="userID" placeholder="Enter Teacher ID or Student ID" minlength="7" maxlength="7">
         <div class="input-group-append">
             <button class="btn btn-outline-primary" onclick="debouncedHandleInput()" type="button">Fetch</button>
         </div>

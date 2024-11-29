@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken")
 const { course, courseAllot } = require("../Models/courseModel");
 const { assignment, submission } = require("../Models/assignment")
 const crypto = require("crypto");
-const { Console } = require("console");
+
 //For Gernating Hash of entered Value
 function generateHashToken(data) {
     return crypto.createHash('sha256').update(data).digest('hex');
@@ -85,7 +85,7 @@ app.route("/")
 
         const user = await admin.findOne({ adminID: id });
 
-        if(user.password==generateHashToken(req.body.password)){
+        if(user.Password==generateHashToken(req.body.password)){
             const cokkieVal = jwt.sign(JSON.stringify(user), "SECRET");
             res.cookie("session", cokkieVal);
 
@@ -138,6 +138,30 @@ app.get("/teachers", async (req, res) => {
     res.render("teacherpage", { courses: coursesname, teacher: user, assignments: assignmentarr });
 
 
+
+
+
+})
+
+app.get("/course/:courseid",async(req,res)=>{
+    const courseID=req.params.id;
+
+
+    const studentAllotments = await courseAllot.find({ courseID:{ $in: [courseID] }, role: "Student" });
+    const studentIDs = studentAllotments.map((allotment) => allotment.userID);
+    const students = await student.find({ studentID: { $in: studentIDs } });
+
+    // Fetch assignments for the course
+    const assignments = await assignmentModel.find({ subjectCode: courseID });
+
+    // Fetch faculty for the course
+    const facultyAllotments = await courseAllot.find({ courseID:{ $in: [courseID] }, role: "Instructor" });
+    res.render("courseDashboard", {
+        courseName: courseDetails.courseName,
+        students,
+        assignments,
+        faculty,
+    });
 
 
 

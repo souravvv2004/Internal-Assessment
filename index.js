@@ -8,6 +8,7 @@ const password = require("./Router/password-reset.js");
 const loginRoute=require("./Router/login.js");
 const assingment=require("./Router/assingment.js")
 const submission=require("./Router/submission.js")
+const courseRoute=require("./Router/course.js")
 const cookieParser = require('cookie-parser'); 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
@@ -48,6 +49,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 
+
+
 app.set('views', path.join(__dirname, 'views'));
 app.get("/",(req,res)=>{res.render("index")});
 app.set('view engine', 'ejs');
@@ -56,6 +59,7 @@ app.use("/univ", univRouter);
 app.use("/forgot", password);
 app.use("/assignment", assingment);
 app.use("/submission",submission);
+app.use("/courses",courseRoute);
 
 // Make the server listen on IPv6 only
 app.listen(3000,  () => {

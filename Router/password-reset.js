@@ -52,7 +52,7 @@ router.post("/", async (req, res) => {
         from: "sourabhmadaan31@gmail.com",
         to: user.Email,
         subject: 'Password Reset Email',
-        html: `Hello ${user.Name}, <br>Click <a href="http://${req.get('host')}/forgot/reset/${hashtoken}">here</a> to reset your password.` // Fixed the anchor tag syntax
+        html: `Hello ${user.Name}, <br>Click <a href="http://${req.get('host')}/forgot/reset/${hashtoken}">here</a> to reset your password.` 
     };
 
     // Expiration Time 
