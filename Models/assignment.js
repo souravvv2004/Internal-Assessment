@@ -18,7 +18,9 @@ const assignmentSchema=new mongo.Schema({
 const submissionSchema=new mongo.Schema({
 
     submissionID:{type:String,required:true,unique:true},
+    graded:{type:String,required:true,default:"Not Graded"},
     assignmentID:{type:String,required:true},
+  
     submissonerID:{type:String,required:true},
     submittedTime:{type:Date,required:true},
     content:{type:String,required:true}

@@ -11,8 +11,8 @@
 
     <!-- Header Section with Course Name and Assignment Name -->
     <div class="bg-primary text-white text-center py-4 mb-4">
-        <h1 class="h4 mb-1"><%= assignment.courseName %> / <%= assignment.assignmentName %></h1>
-        <p class="mb-0">Assignment Description: <%= assignment.description %></p>
+        <h1 class="h4 mb-1"><%= subjectName%></h1>
+       
     </div>
 
     <div class="container">
@@ -20,10 +20,15 @@
         <div class="card mb-4">
             <div class="card-body">
                 <h5 class="card-title">Assignment: <%= assignment.assignmentName %></h5>
-                <p class="card-text text-danger">Time Remaining: <%= assignment.timeRemaining %></p>
+                <p class="card-text text-danger"><%= assignment.content%></p>
+                <a href=<%=assignment.assignmentPath%>>Assignment File</a>
             </div>
         </div>
-
+        <!-- For Teacher -->
+         <% if (role=="Instructor") { %>
+          
+         
+         <div>
         <!-- Students List Section for Submitted Students -->
         <div class="card mb-4">
             <div class="card-header bg-secondary text-white">
@@ -33,17 +38,17 @@
                 <% if (submittedStudents.length > 0) { %>
                     <% submittedStudents.forEach(student => { %>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><%= student["Name"] %></span>
-                            <span class="badge <%= student.status === 'Graded' ? 'bg-success' : 'bg-warning' %>">
-                                <%= student.status %>
+                            <span><%= student["studentDetails"]["Name"] %></span>
+                            <span class="badge <%= student["graded"] === 'Graded' ? 'bg-success' : 'bg-warning' %>">
+                                <%= student["graded"] %>
                             </span>
                             <div>
-                                <% if (student.status === 'Graded') { %>
-                                    <button class="btn btn-sm btn-outline-info me-2">View Marks</button>
+                                <% if (student["graded"] === 'Graded') { %>
+                                    <a class="btn btn-sm btn-outline-info me-2">View Marks</a>
                                 <% } else { %>
-                                    <button class="btn btn-sm btn-outline-primary me-2">Assign Marks</button>
+                                    <a class="btn btn-sm btn-outline-primary me-2">Assign Marks</a>
                                 <% } %>
-                                <button class="btn btn-sm btn-outline-secondary">View Details</button>
+                                <a href=<%= `/submission/${student["submissionID"]}`%> class="btn btn-sm btn-outline-secondary">View Details</a>
                             </div>
                         </li>
                     <% }) %>
@@ -72,9 +77,78 @@
                 <% } %>
             </ul>
         </div>
+        </div>
+
+
+
+        <% } else { %>
+            <form action="" method="POST" enctype="multipart/form-data">
+            <div class="container">
+                <h3 class="text-center mb-3">Assignment Submission Details</h3>
+                <table class="table table-bordered table-striped">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Field</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <p hidden id="optionToSubmit"><%=toSubmit%></p>
+                        <!-- Conditional row styling based on submission status -->
+                        <tr class="<%= submissionStatus ? 'bg-success text-white' : '' %>">
+                            <td>Submission Status</td>
+                            <td><%= submissionStatus ? "Submitted":"Not Submitted"%></td>
+                        </tr>
+                        <tr>
+                            <td>Graded</td>
+                            <td><%= gradingStatus %></td>
+                        </tr>
+                        <tr>
+                            <td>Time Remaining</td>
+                            <td><%= timeRemaining %></td>
+                        </tr>
+                        <tr>
+                            <td>Last modified</td>
+                            <td><%= lastModified%></td>
+                        </tr>
+                        <tr>
+                            <td>Submitted File</td>
+                            <td>
+                               
+                                <% if (fileSubmission!=="Yet To Submit") { %>
+                                    <a href="<%= fileSubmission%>" class="btn btn-sm btn-outline-info" target="_blank">View File</a>
+                                <% } else { %>
+                                    
+                                     
+                                        <input type="file" id="files" name="files" multiple>
+                                     
+                                <% } %>
+                            </td>
+                        </tr>
+                   
+                        
+                       
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" hidden >Add Submission</button>
+        </form>
+            
+
+
+         <%}%>
+
+
+
     </div>
 
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if(document.getElementById("optionToSubmit").innerHTML=="true"){document.getElementsByTagName("button").style.display=None; }
+        
+        
+     
+    </script>
 </body>
 </html>
