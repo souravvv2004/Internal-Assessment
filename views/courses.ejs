@@ -24,7 +24,7 @@
         <form id="courseForm" class="mt-4" action="" method="post">
             <div class="form-group">
                 <label for="courseID">Course ID </label>
-                <input type="hidden" id="courseIDList" value="<%= JSON.stringify(arr) %>">
+                <input type="hidden" id="courseIDList" value="<%= JSON.stringify(array) %>">
                 <input style="text-transform: uppercase;" placeholder="Enter Unique Course ID (E.g. CSC-101)" type="text" id="courseID" name="courseID" 
                        class="form-control" required minlength="7" maxlength="7" >
                 <small id="courseIDError" class="error-message"></small>
