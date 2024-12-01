@@ -52,27 +52,24 @@
   <div class="container courses">
     <h2>Courses</h2>
     
-        <% if (courses.length>0) { %>
-         
-    <div class="row">
-      <% courses.forEach(course => { %> <!-- Courses array passed from backend -->
-        <div class="col-md-4">
-          <div class="card">
-            <!-- <img src="<%# course.image %>" class="card-img-top" alt="Course Image"> -->
-            <div class="card-body">
-              <h3 class="card-title"><%= course["courseID"] %></h3>
-              <h5 class="card-text"><%= course["courseName"] %></h5>
-              <a href=/courses/<%=course["courseID"]%> class="btn btn-primary">View Course</a>
+    <% if (courses.length > 0) { %>
+      <div class="row">
+        <% courses.forEach(course => { %> <!-- Courses array passed from backend -->
+          <div class="col-md-4">
+            <div class="card">
+              <!-- <img src="<%# course.image %>" class="card-img-top" alt="Course Image"> -->
+              <div class="card-body">
+                <h3 class="card-title"><%= course["courseID"] %></h3>
+                <h5 class="card-text"><%= course["courseName"] %></h5>
+                <a href="/courses/<%= course["courseID"] %>" class="btn btn-primary">View Course</a>
+              </div>
             </div>
           </div>
-        </div>
-    
-         
         <% }) %>
-     
-         <% } else { %>
-        <p>No Courses have been courseAlloted.</p>
-      <% } %>
+      </div>
+    <% } else { %>
+      <p>No Courses have been allotted.</p>
+    <% } %>
     
   </div>
 
@@ -100,7 +97,7 @@
                 <td><%= new Date(assignment.endDate).toLocaleDateString("en-US", { 
                   year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" 
                 }) %></td>
-                <td>Pending</td>
+                <td><%= assignment.status %></td> <!-- Fixed the missing EJS tag -->
                 <td><a href="/assignment/<%= assignment.assignmentID %>" class="btn btn-info">View Details</a></td>
               </tr>
             <% }) %>
@@ -128,11 +125,11 @@
             <% submittedAssignments.forEach(assignment => { %>
               <tr>
                 <td><%= assignment.assignmentName %></td>
-                <td><%= new Date(assignment.submissionDate).toLocaleDateString("en-US", { 
+                <td><%= new Date(assignment.submittedTime).toLocaleDateString("en-US", { 
                   year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" 
                 }) %></td>
                 <td>Submitted</td>
-                <td><a href="/assignment/<%= assignment.assignmentID %>" class="btn btn-info">View Details</a></td>
+                <td><a href="/submission/<%= assignment.submissionID %>" class="btn btn-info">View Details</a></td>
               </tr>
             <% }) %>
           </tbody>

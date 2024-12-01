@@ -15,6 +15,19 @@
     </div>
 
     <div class="container">
+
+
+         <!-- List of Faculty Members -->
+         <div>
+            <h2 class="h5 mb-3">Faculty</h2>
+            <ul class="list-group">
+                <% faculty.forEach(facultyMember => { %>
+                    <li class="list-group-item">
+                        <strong><%= facultyMember.teacherID %></strong> - <%= facultyMember.Name %>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
         <!-- List of Allotted Students -->
         <div class="mb-4">
             <h2 class="h5 mb-3">Allotted Students</h2>
@@ -34,23 +47,13 @@
                 <% assignments.forEach(assignment => { %>
                     <li class="list-group-item">
                         <strong><%= assignment.assignmentName %></strong> - Due: <%= assignment.endDate %>
-                        <a href="<%= assignment.assignmentPath %>" class="btn btn-sm btn-outline-primary float-end">View</a>
+                        <a href="/assignment/<%= assignment.assignmentID %>" class="btn btn-sm btn-outline-primary float-end">View</a>
                     </li>
                 <% }); %>
             </ul>
         </div>
 
-        <!-- List of Faculty Members -->
-        <div>
-            <h2 class="h5 mb-3">Faculty</h2>
-            <ul class="list-group">
-                <% faculty.forEach(facultyMember => { %>
-                    <li class="list-group-item">
-                        <strong><%= facultyMember.teacherID %></strong> - <%= facultyMember.Name %>
-                    </li>
-                <% }); %>
-            </ul>
-        </div>
+       
     </div>
 </body>
 </html>

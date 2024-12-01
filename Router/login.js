@@ -84,6 +84,10 @@ app.route("/")
     else if(id=="ADMIN"){
 
         const user = await admin.findOne({ adminID: id });
+        console.log(user)
+        console.log("Password enter :",req.body.password);
+
+        console.log("Hashed Password is ",generateHashToken(req.body.password))
 
         if(user.Password==generateHashToken(req.body.password)){
             const cokkieVal = jwt.sign(JSON.stringify(user), "SECRET");
@@ -205,33 +209,77 @@ app.post("/course/create", upload.single("formFileSm"), async (req, res) => {
 app.get("/student",async (req,res)=>{
 
     var user = jwt.verify(req.cookies.session, "SECRET");
-    let coursescode=[],coursesname,assignmentarr,submissionarr=[];
+    let coursescode = [], coursesname, assignmentarr = [], submissionarr = [];
     
-
-     coursescode = await courseAllot.find({ userID: user.studentID, role: "Student" }) || [];
-
-     coursesname = coursescode.length > 0 ? await course.find({
-         courseID: { $in: coursescode[0]["courseID"] }
-     }) : [];
-
-
-     assignmentarr = coursescode.length > 0 ? await assignment.find({
-         subjectCode: { $in: coursescode[0]["courseID"] }
-     }) : [];
-     
-
-     
-
-
-    res.render("studentpage", { courses: coursesname, student: user, pendingAssignments: assignmentarr,submittedAssignments:submissionarr });
-
-
-
-
-
-
+    // Fetch courses for the student
+    coursescode = await courseAllot.find({ userID: user.studentID, role: "Student" }) || [];
+    
+    coursesname = coursescode.length > 0 ? await course.find({
+        courseID: { $in: coursescode[0]["courseID"] }
+    }) : [];
+    
+    // Fetch all assignments related to the student's courses
+    assignmentarr = coursescode.length > 0 ? await assignment.find({
+        subjectCode: { $in: coursescode[0]["courseID"] }
+    }) : [];
+    
+    // Fetch all submissions for the student
+    submissionarr = await submission.aggregate([
+        {
+            $match: { submissonerID: user["studentID"] } // Match submissions for a specific student (submissonerID)
+        },
+        {
+            $lookup: {
+                from: "assignments", // The collection to join (assignment collection)
+                localField: "assignmentID", // Field in the submission collection
+                foreignField: "assignmentID", // Field in the assignment collection
+                as: "assignmentDetails" // Output field with assignment details
+            }
+        },
+        {
+            $unwind: {
+                path: "$assignmentDetails",  // Unwind to flatten the array
+                preserveNullAndEmptyArrays: true  // If no matching assignment, keep the submission
+            }
+        },
+        {
+            $project: {
+                
+                assignmentID:1,
+                submissionID: 1, // Include the submission ID
+                graded: 1, // Include the grading status
+                submittedTime: 1, // Include the time when it was submitted
+                content: 1, // Include the content of the submission (path or content itself)
+                _id: 0 ,// Exclude the MongoDB _id field
+                assignmentName: "$assignmentDetails.assignmentName"
+               
+            }
+        }
+    ]);
+    
+    // Extract assignmentIDs from the submission array
+    const submittedAssignmentIDs = submissionarr.map(sub => sub.assignmentID);
+    
+    // Filter the assignments array to exclude the submitted assignments (show only pending assignments)
+    const pendingAssignments = assignmentarr.filter(assign =>
+        !submittedAssignmentIDs.includes(assign.assignmentID)
+    );
+    
+    // Log the arrays for debugging (can be removed after testing)
+    console.log('All Assignments:', assignmentarr);
+    console.log('Submitted Assignments:', submissionarr);
+    console.log('Pending Assignments:', pendingAssignments);
+    
+    // Render the student page with all necessary data
+    res.render("studentpage", {
+        courses: coursesname,
+        student: user,
+        pendingAssignments: pendingAssignments,
+        submittedAssignments: submissionarr
+    });
+    
+    
 })
-
 
 
 

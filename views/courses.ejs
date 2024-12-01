@@ -3,25 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>University Response Form</title>
+    <title>Course Creation</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Custom style for error feedback */
+        .input-error {
+            border-color: red;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.875em;
+            margin-top: 0.25em;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h2 class="mt-5">University Course Response Form</h2>
-        <form action="/univ/courses" method="POST" class="mt-4">
+        <h2 class="mt-5">University Course Creation Form</h2>
+        <form id="courseForm" class="mt-4" action="" method="post">
             <div class="form-group">
                 <label for="courseID">Course ID </label>
-                <input style="text-transform: uppercase;" type="text" id="courseID" name="courseID" class="form-control" required minlength="7" maxlength="7">
+                <input type="hidden" id="courseIDList" value="<%= JSON.stringify(arr) %>">
+                <input style="text-transform: uppercase;" placeholder="Enter Unique Course ID (E.g. CSC-101)" type="text" id="courseID" name="courseID" 
+                       class="form-control" required minlength="7" maxlength="7" >
+                <small id="courseIDError" class="error-message"></small>
             </div>
 
             <div class="form-group">
                 <label for="courseName">Course Name</label>
-                <input style="text-transform: capitalize;" type="text" id="courseName" name="courseName" class="form-control" required>
+                <input style="text-transform: capitalize;" 
+                       type="text" placeholder="Enter Desired Course Name" 
+                       id="courseName" name="courseName" 
+                       class="form-control" required>
             </div>
 
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
+
+    <script>
+        // Retrieve the list of used course IDs from the hidden input element
+        let arr = JSON.parse(document.getElementById("courseIDList").value);
+        console.log(arr);
+
+        // References to elements
+        const courseIDInput = document.getElementById("courseID");
+        const courseIDError = document.getElementById("courseIDError");
+        const courseForm = document.getElementById("courseForm");
+
+        // Event listener for input validation
+        courseIDInput.addEventListener("input", () => {
+            const enteredID = courseIDInput.value.toUpperCase(); // Normalize to uppercase
+
+            if (arr.includes(enteredID)) {
+                // Add error class and show error message if course ID is already used
+                courseIDInput.classList.add("input-error");
+                courseIDError.textContent = "This Course ID is already used. Please choose another.";
+            } else {
+                // Remove error class and clear error message if course ID is unique
+                courseIDInput.classList.remove("input-error");
+                courseIDError.textContent = "";
+            }
+        });
+
+        // Prevent form submission if there are errors
+        courseForm.addEventListener("submit", (event) => {
+            if (courseIDInput.classList.contains("input-error")) {
+                event.preventDefault();
+                alert("Please fix the errors in the form before submitting.");
+            }
+        });
+    </script>
 </body>
 </html>

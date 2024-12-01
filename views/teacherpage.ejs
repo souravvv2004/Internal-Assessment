@@ -139,7 +139,7 @@
                 <% if (new Date(assignment.endDate) > new Date()) { %>
                   Pending
                 <% } else { %>
-                  Due
+                  Time to Check
                 <% } %>
               </span>
               <a href="/assignment/<%= assignment.assignmentID %>" class="btn btn-info">View Details</a>
