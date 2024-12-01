@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const teacherSchema = new mongoose.Schema({
-    teacherID: { type: String, required: true },
+    teacherID: { type: String, required: true,unique:1 },
     Name: { type: String, required: true },
     Email: { type: String, required: true },
     Password:{type:String,required:true,default:"NOT SET"},
@@ -17,7 +17,7 @@ const teacherSchema = new mongoose.Schema({
 const studentSchema=new mongoose.Schema({
 
 
-    studentID:{type:String,required:true},
+    studentID:{type:String,required:true,unique:1},
     Name: { type: String, required: true },
     Email: { type: String, required: true,unique:true },
     Password:{type:String,required:true,default:"NOT SET"},

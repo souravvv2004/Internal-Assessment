@@ -40,7 +40,13 @@
                     </tr>
                     <tr>
                         <td>Graded</td>
-                        <td><%= submission["graded"] || "Not Graded" %></td>
+                        <% if (submission["graded"]==="Not Graded") { %>
+                            <td><%= submission["graded"] || "Not Graded" %></td>
+                        
+                        <% } else  { %>
+                         
+                        <td style="background-color: rgb(56, 141, 56);"><%= submission["graded"] || "Not Graded" %></td>
+                        <%}%>
                     </tr>
                     <tr>
                         <td>Submitted Time</td>

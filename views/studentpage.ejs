@@ -97,7 +97,7 @@
                 <td><%= new Date(assignment.endDate).toLocaleDateString("en-US", { 
                   year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" 
                 }) %></td>
-                <td><%= assignment.status %></td> <!-- Fixed the missing EJS tag -->
+                <td style="background-color: brown;">Pending</td> <!-- Fixed the missing EJS tag -->
                 <td><a href="/assignment/<%= assignment.assignmentID %>" class="btn btn-info">View Details</a></td>
               </tr>
             <% }) %>
@@ -128,7 +128,7 @@
                 <td><%= new Date(assignment.submittedTime).toLocaleDateString("en-US", { 
                   year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" 
                 }) %></td>
-                <td>Submitted</td>
+                <td style="background-color: rgb(52, 165, 42);">Submitted</td>
                 <td><a href="/submission/<%= assignment.submissionID %>" class="btn btn-info">View Details</a></td>
               </tr>
             <% }) %>
