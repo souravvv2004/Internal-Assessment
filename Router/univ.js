@@ -76,12 +76,12 @@ router.route("/createUser")
             
             await newTeacher.save(); // Save the teacher record
           
-            console.log("Teacher ID is ",studentID);
+            console.log("Teacher ID is ",teacherID);
             var mailOptions = {
                 from: "sourabhmadaan31@gmail.com",
                 to: newTeacher.Email,
                 subject: 'Registering Email',
-                text: `<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;"><h2 style="color: #4CAF50; ">Welcome to Our Organization!</h2>
+                html: `<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;"><h2 style="color: #4CAF50; ">Welcome to Our Organization!</h2>
                 <p>Dear <strong>${req.body.Name}</strong>,</p>
                 <p>Welcome to the organization! We are thrilled to have you on board as part of our team.</p>
                 <p><strong>Your unique Teacher ID is:</strong> <span style="color: #007BFF;">${teacherID}</span></p>
@@ -119,14 +119,14 @@ router.route("/createUser")
             var mailOptions = {
                 from: "sourabhmadaan31@gmail.com",
                 to: newStudent.Email,
-                subject: '<h2>Registering Email</h2>',
-                text: `<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;"><h2 >Welcome to Our Organization!</h2>
+                subject: 'Registering Email',
+                html: `<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;"><h2 style="color: #4CAF50; ">Welcome to Our Organization!</h2>
                 <p>Dear <strong>${req.body.Name}</strong>,</p>
                 <p>Welcome to the organization! We are thrilled to have you on board as part of our team.</p>
-                <p><strong>Your unique Teacher ID is:</strong> <span style="color: #007BFF;">${studentID}</span></p>
-                <p>To set up your password and access the Teacher Module, please follow these steps:</p>
+                <p><strong>Your unique student ID is:</strong> <span style="color: #007BFF;">${studentID}</span></p>
+                <p>To set up your password and access the Student Module, please follow these steps:</p>
                 <ol>
-                    <li>Go to the <strong>Teacher Module</strong>.</li>
+                    <li>Go to the <strong>Student Module</strong>.</li>
                     <li>Click on <strong>"Forgot Password"</strong> to initiate the password setup process.</li>
                 </ol>
                 <p>If you have any questions or require assistance, please don’t hesitate to reach out to our support team.</p>
@@ -229,8 +229,14 @@ router.get("/courseAlloted/:userID", async (req, res) => {
 //--------------------------------------------------------------------------------------------------------------------------------------
 router.route("/courses")    
 
-.get((req,res)=>{
-    res.render("courses.ejs");
+.get(async(req,res)=>{
+
+    let coursearr=await course.find({},{courseID:1,_id:0});
+    coursearr=coursearr.map(item => item.courseID);
+    coursearr=JSON.stringify(coursearr)
+    
+    
+    res.render("courses.ejs",{array:coursearr});
 })
 .post(async(req,res)=>{
 
@@ -273,13 +279,13 @@ router.route("/courses")
 router.route("/courseAllot")
 .get(async(req,res)=>{
     
-    let coursearr=await course.find({});
-    
+    let coursearr=await course.find({});  
     res.render("courseAllot.ejs",{array:coursearr});})
 .post(async(req,res)=>{
     let subjectarr=req.body;
     console.log(subjectarr);
     
+  
     try{
         await courseAllot.insertMany(subjectarr);
     }

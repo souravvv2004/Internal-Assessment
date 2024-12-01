@@ -24,18 +24,20 @@ app.get("/:courseID", async (req, res) => {
         const studentIDs = studentAllotments.map((allotment) => allotment.userID);
         console.log(studentIDs)
         const students = await student.find({ studentID: { $in: studentIDs } });
-
+        
+        students.sort((a, b) => a.studentID.localeCompare(b.studentID));
         // Fetch assignments for the course
         const assignments = await assignment.find({ subjectCode: courseID });
+        assignments.sort((a, b) => a.assignmentID.localeCompare(b.assignmentID));
 
         // Fetch faculty associated with the course
         const facultyAllotments = await courseAllot.find({ courseID: { $in: [courseID] }, role: "Instructor" });
         const facultyIDs = facultyAllotments.map((allotment) => allotment.userID);
         const faculty = await teacher.find({ teacherID: { $in: facultyIDs } });
-
+        faculty.sort((a, b) => a.teacherID.localeCompare(b.teacherID));
         // Render the data in the course dashboard
         res.render("coursePage", {
-            courseName: courseDetails.courseName,
+            courseName: `${courseDetails.courseID}:${courseDetails.courseName}`,
             students,
             assignments,
             faculty,

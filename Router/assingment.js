@@ -263,7 +263,7 @@ app.post("/:assignmentID",upload.single("files"),async(req,res)=>{
 
     const numofprevsubmission = await submission.countDocuments({ assignmentID: assignmentInstance.assignmentID }) + 1;
 
-    let submissionID=`S${assignmentInstance.subjectCode}:${numofprevsubmission.toString().padStart(3, '0')}`;
+    let submissionID=`S${assignmentInstance.assignmentID}:${numofprevsubmission.toString().padStart(3, '0')}`;
     let assignmentID=req.params.assignmentID;
    
     let user = jwt.verify(req.cookies.session, "SECRET");

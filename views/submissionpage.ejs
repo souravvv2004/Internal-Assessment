@@ -17,7 +17,7 @@
             <div class="card-body">
                 <h5 class="card-title">Assignment: <%= assignment.assignmentName || "No Assignment Name" %></h5>
                 <p class="card-text text-danger"><%= assignment.content || "No Assignment Content" %></p>
-                <a href="<%= assignment.assignmentPath || "#" %>" target="_blank">Assignment File</a>
+                <a href="/<%= assignment.assignmentPath || "#" %>" target="_blank">Assignment File</a>
             </div>
         </div>
        
@@ -49,7 +49,7 @@
                     <tr>
                         <td>Submitted File</td>
                         <td>
-                            <a href="<%= submission["content"] || "#" %>" class="btn btn-sm btn-outline-info" target="_blank">View File</a>
+                            <a href="/<%= submission["content"] || "#" %>" class="btn btn-sm btn-outline-info" target="_blank">View File</a>
                         </td>
                     </tr>
                     <% if (submission["graded"] === "Not Graded") { %>

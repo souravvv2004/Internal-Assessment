@@ -17,7 +17,7 @@ try{
       }
     var {submissionID} = req.params;
     
-    submissionID = submissionID.slice(1, 8);
+    submissionID = submissionID.slice(2, 9);
     console.log("Course is ",submissionID)
     
     const user = jwt.verify(req.cookies.session,"SECRET");
@@ -61,12 +61,15 @@ app.route("/:submissionID")
 .get(validateUser,async(req,res)=>{
 
     const submissionInstance=await submission.findOne({submissionID:req.params.submissionID});
-    const assignmentID='A'+req.params.submissionID.slice(1)
+    const assignmentID=req.params.submissionID.slice(1,13);
+    console.log(assignmentID);
     const assignmentInstance=await assignment.findOne({assignmentID:assignmentID});
     const studentName=await student.findOne( { studentID:submissionInstance[ "submissonerID" ] },{Name:1,_id:0} );
 
-    
-    const subjectName=`${assignmentInstance["subjectCode"]}:${await course.find({courseID:assignmentInstance["subjectCode"]},{courseName:1,_id:0})}`;
+    let courseName=await course.findOne({courseID:assignmentInstance["subjectCode"]},{courseName:1,_id:0});
+    courseName=courseName["courseName"];
+    console.log(courseName)
+    const subjectName=`${assignmentInstance["subjectCode"]}:${courseName}`;
     console.log("Assignment is ",assignmentInstance,"\nSubmission is",submissionInstance,"Student Name",studentName);
 
     res.render("submissionpage",{assignment:assignmentInstance,submission:submissionInstance,subjectName:subjectName,studentName:studentName["Name"]});
@@ -83,7 +86,7 @@ app.route("/:submissionID")
     console.log("Marks is ", req.body);
     const submissionID = req.params.submissionID;
     console.log("submission is ", submissionID);
-    const assignmentID = "A" + submissionID.slice(1);
+    const assignmentID =submissionID.slice(1,13);
     const assignmentInstance = await assignment.findOne({
       assignmentID: assignmentID,
     });

@@ -1,8 +1,7 @@
 const express = require("express");
-const router = express.Router();
+const app = express();
 const nodemailer = require('nodemailer');
 const {teacher,student} = require('../Models/userModel');
-
 const crypto = require("crypto");
 const email=process.env.Email;
 const PASSKEY=process.env.PASSKEY;
@@ -28,21 +27,27 @@ function generateHashToken(data) {
     return crypto.createHash('sha256').update(data).digest('hex');
 }
 
-// To send the password reset link 
-router.get("/", (req, res) => {
-    res.send("<h5>I am alive </h5>");
+//--------------------------------------------------------------------------------------------------------------------------------------
+//                                              Rendering Forgot Password Page
+//--------------------------------------------------------------------------------------------------------------------------------------
+
+app.get("/", (req, res) => {
+    res.render("forgot-password");
 });
 
-router.post("/", async (req, res) => {
+//--------------------------------------------------------------------------------------------------------------------------------------
+//                                              Handling Forgot Password Route
+//--------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+app.post("/", async (req, res) => {
     const id = req.body.userID;
    
     var user=await teacher.findOne({ teacherID: id }); 
     if(!user){user=await student.findOne({ studentID: id }); }
 
-    if (!user) {
-        
-        return res.status(404).send("<h1>User not found</h1>");
-    }
+    if (!user) {return res.status(404).send("<h1>User not found</h1>");}
 
     const hashtoken = generateHashToken1();
     console.log("Email id is ", user.Email);
@@ -63,8 +68,8 @@ router.post("/", async (req, res) => {
     user.token=hashtoken;
     user.expiretime=expirationTime;
     await user.save();
-    console.log("user updated successfully");
-    //await teacher.updateOne({ teacherID: id }, { token: hashtoken, expireTime: expirationTime }); // Added await
+    console.log("user token and hashtime is updated successfully");
+   
 
     // Sending Mail 
     transporter.sendMail(mailOptions, function(error, info) {
@@ -79,8 +84,8 @@ router.post("/", async (req, res) => {
 });
 
 // GET route to handle the token and render password reset page
-router.get("/reset/:token", async (req, res) => {
-    const tokenhash = req.params.token;
+app.get("/reset/:token", async (req, res) => {
+     const tokenhash = req.params.token;
 
     let user = await teacher.findOne({ token: tokenhash });
     if (!user) {user=await student.findOne({ token: tokenhash });}
@@ -97,7 +102,7 @@ router.get("/reset/:token", async (req, res) => {
 });
 
 // POST route to set the password 
-router.post("/reset", async (req, res) => {
+app.post("/reset", async (req, res) => {
     const tokenhash = req.body.token;
 
     let user = await teacher.findOne({ token: tokenhash });
@@ -135,4 +140,4 @@ router.post("/reset", async (req, res) => {
     res.send("Password Changed Successfully");
 });
 
-module.exports = router;
+module.exports = app;
