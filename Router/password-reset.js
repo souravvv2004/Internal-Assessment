@@ -93,7 +93,7 @@ app.get("/reset/:token", async (req, res) => {
         return res.redirect("/login?alert=Invalid%20Link");
     }
 
-    const expirationTime = user.expireTime; // Fixed variable name
+    const expirationTime = user.expiretime; // Fixed variable name
     if (Date.now() > new Date(expirationTime)) {
         return res.redirect("/login?alert=Link%20Expired");
     }
@@ -111,7 +111,7 @@ app.post("/reset", async (req, res) => {
         return res.redirect("/login?alert=Invalid%20Link");
     }
 
-    const expirationTime = user.expireTime; // Fixed variable name
+    const expirationTime = user.expiretime; // Fixed variable name
     if (Date.now() > new Date(expirationTime)) {
         return res.redirect("/login?alert=Link%20Expired");
     }

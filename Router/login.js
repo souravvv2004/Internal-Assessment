@@ -55,7 +55,7 @@ app.route("/")
     
         //Validating Password
         if (user.Password == generateHashToken(req.body.password)) {
-            const cokkieVal = jwt.sign(JSON.stringify(user), "SECRET");
+            const cokkieVal = jwt.sign(JSON.stringify(user), process.env.JWT_SECRET);
             res.cookie("session", cokkieVal);
             return res.redirect("login/teachers");
         }
@@ -74,7 +74,7 @@ app.route("/")
         }
         console.log("Password is ",generateHashToken(req.body.password));
         if (user.Password == generateHashToken(req.body.password)) {
-            const cokkieVal = jwt.sign(JSON.stringify(user), "SECRET");
+            const cokkieVal = jwt.sign(JSON.stringify(user), process.env.JWT_SECRET);
             res.cookie("session", cokkieVal);
             return res.redirect("login/student");
         } else {
@@ -90,7 +90,7 @@ app.route("/")
         console.log("Hashed Password is ",generateHashToken(req.body.password))
 
         if(user.Password==generateHashToken(req.body.password)){
-            const cokkieVal = jwt.sign(JSON.stringify(user), "SECRET");
+            const cokkieVal = jwt.sign(JSON.stringify(user), process.env.JWT_SECRET);
             res.cookie("session", cokkieVal);
 
             return res.redirect("/univ");
@@ -115,7 +115,7 @@ app.route("/")
 
 app.get("/teachers", async (req, res) => {
    
-    var user = jwt.verify(req.cookies.session, "SECRET");
+    var user = jwt.verify(req.cookies.session, process.env.JWT_SECRET);
   
 
 
@@ -148,7 +148,7 @@ app.get("/teachers", async (req, res) => {
 })
 
 app.get("/course/:courseid",async(req,res)=>{
-    const courseID=req.params.id;
+    const courseID=req.params.courseidid;
 
 
     const studentAllotments = await courseAllot.find({ courseID:{ $in: [courseID] }, role: "Student" });
@@ -208,7 +208,7 @@ app.post("/course/create", upload.single("formFileSm"), async (req, res) => {
 
 app.get("/student",async (req,res)=>{
 
-    var user = jwt.verify(req.cookies.session, "SECRET");
+    var user = jwt.verify(req.cookies.session, process.env.JWT_SECRET);
     let coursescode = [], coursesname, assignmentarr = [], submissionarr = [];
     
     // Fetch courses for the student
