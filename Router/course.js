@@ -3,7 +3,7 @@ const app = express();
 
 const {teacher,student,admin} = require("../Models/userModel");
 const multer = require("multer")
-const jwt = require("jsonwebtoken")
+const { signToken, verifyToken } = require("../utils/jwt")
 const { course, courseAllot } = require("../Models/courseModel");
 const { assignment, submission } = require("../Models/assignment")
 const crypto = require("crypto");

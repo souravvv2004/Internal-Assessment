@@ -1,5 +1,5 @@
 const express=require("express");
-const jwt=require("jsonwebtoken")
+const { signToken, verifyToken } = require("../utils/jwt")
 const app=express();
 const cookieParser = require("cookie-parser");
 
@@ -20,7 +20,7 @@ try{
     submissionID = submissionID.slice(2, 9);
     console.log("Course is ",submissionID)
     
-    const user = jwt.verify(req.cookies.session,"SECRET");
+    const user = await verifyToken(req.cookies.session);
     if(user.studentID){
         const courseAlloted=await courseAllot.find({userID:user.studentID,role:"Student"},{courseID:1,_id:0});
 

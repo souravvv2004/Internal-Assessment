@@ -1,9 +1,9 @@
 const express = require("express");
 const app = express();
 
-const {teacher,student,admin} = require("../Models/userModel");
+const { teacher, student, admin } = require("../Models/userModel");
 const multer = require("multer")
-const jwt = require("jsonwebtoken")
+const { signToken, verifyToken } = require("../utils/jwt")
 const { course, courseAllot } = require("../Models/courseModel");
 const { assignment, submission } = require("../Models/assignment")
 const crypto = require("crypto");
@@ -35,74 +35,86 @@ app.route("/")
 
 
     })
-    
-.post(async (req, res) => {
-    // Check The User ID
-    const id = req.body.userID.toUpperCase();
-    console.log(id);
 
-    // Teacher ID
-    if (id[0] == 'T') {
-        const user = await teacher.findOne({ teacherID: id });
-        console.log(user);
-        if (!user) {
-            return res.status(404).json({ error: "Incorrect User ID" }); // Send JSON error response
-        }
-        if (user.Password == "Not Set") {return res.redirect("/forgot");}
-        
-        
-    
-    
-        //Validating Password
-        if (user.Password == generateHashToken(req.body.password)) {
-            const cokkieVal = jwt.sign(JSON.stringify(user), process.env.JWT_SECRET);
-            res.cookie("session", cokkieVal);
-            return res.redirect("login/teachers");
-        }
-         else {
-            return res.status(404).json({ error: "Incorrect Password" });
-        }
-    }
+    .post(async (req, res) => {
+        // Check The User ID
+        const id = req.body.userID.toUpperCase();
+        console.log(id);
 
-    else if (id[0] == 'S') {
-        const user = await student.findOne({ studentID: id });
-        if (!user) {
-            return res.status(404).json({ error: "Incorrect User ID" });
+        // Teacher ID
+        if (id[0] == 'T') {
+            const user = await teacher.findOne({ teacherID: id });
+            console.log(user);
+            if (!user) {
+                return res.status(404).json({ error: "Incorrect User ID" }); // Send JSON error response
+            }
+            if (user.Password == "Not Set") { return res.redirect("/forgot"); }
+
+
+
+
+            //Validating Password
+            if (user.Password == generateHashToken(req.body.password)) {
+                const cookkieVal = await signToken({ id: user.teacherID || user.studentID || user.adminID, role: user.teacherID ? "Teacher" : user.studentID ? "Student" : "Admin" });
+                res.cookie("session", cookkieVal, {
+                    httpOnly: true,
+                    secure: true,
+                    maxAge: 24 * 60 * 60 * 1000
+                });
+                return res.redirect("login/teachers");
+            }
+            else {
+                return res.status(404).json({ error: "Incorrect Password" });
+            }
         }
-        if (user.Password == "Not Set") {
-            return res.redirect("/forgot");
+
+        else if (id[0] == 'S') {
+            const user = await student.findOne({ studentID: id });
+            if (!user) {
+                return res.status(404).json({ error: "Incorrect User ID" });
+            }
+            if (user.Password == "Not Set") {
+                return res.redirect("/forgot");
+            }
+            console.log("Password is ", generateHashToken(req.body.password));
+            if (user.Password == generateHashToken(req.body.password)) {
+                const cookkieVal = await signToken({ id: user.teacherID || user.studentID || user.adminID, role: user.teacherID ? "Teacher" : user.studentID ? "Student" : "Admin" });
+                                res.cookie("session", cookkieVal, {
+                    httpOnly: true,
+                    secure: true,
+                    maxAge: 24 * 60 * 60 * 1000
+                });
+                return res.redirect("login/student");
+            } else {
+                return res.status(404).json({ error: "Incorrect Password" });
+            }
         }
-        console.log("Password is ",generateHashToken(req.body.password));
-        if (user.Password == generateHashToken(req.body.password)) {
-            const cokkieVal = jwt.sign(JSON.stringify(user), process.env.JWT_SECRET);
-            res.cookie("session", cokkieVal);
-            return res.redirect("login/student");
-        } else {
-            return res.status(404).json({ error: "Incorrect Password" });
-        }
-    }
-    else if(id=="ADMIN"){
+        else if (id == "ADMIN") {
 
-        const user = await admin.findOne({ adminID: id });
-        console.log(user)
-        console.log("Password enter :",req.body.password);
+            const user = await admin.findOne({ adminID: id });
+            console.log(user)
+            console.log("Password enter :", req.body.password);
 
-        console.log("Hashed Password is ",generateHashToken(req.body.password))
+            console.log("Hashed Password is ", generateHashToken(req.body.password))
 
-        if(user.Password==generateHashToken(req.body.password)){
-            const cokkieVal = jwt.sign(JSON.stringify(user), process.env.JWT_SECRET);
-            res.cookie("session", cokkieVal);
+            if (user.Password == generateHashToken(req.body.password)) {
+                const cookkieVal = await signToken({ id: user.teacherID || user.studentID || user.adminID, role: user.teacherID ? "Teacher" : user.studentID ? "Student" : "Admin" });
+                res.cookie("session", cookkieVal, {
+                    httpOnly: true,
+                    secure: true,
+                    maxAge: 24 * 60 * 60 * 1000
+                });
 
-            return res.redirect("/univ");
+                return res.redirect("/univ");
+
+            }
+            else { return res.status(404).json({ error: "Incorrect Password" }); }
 
         }
-        else{return res.status(404).json({ error: "Incorrect Password" });}
-        
-    } 
-    else {
-        return res.status(404).json({ error: "Incorrect User ID Format" });
-    }
-});
+        else {
+            return res.status(404).json({ error: "Incorrect User ID Format" });
+        }
+    });
 
 //--------------------------------------------------------------------------------------------------------------------------------
 
@@ -114,30 +126,30 @@ app.route("/")
 //----------------------------------------------------------------------------------------------------------------------------------
 
 app.get("/teachers", async (req, res) => {
-   
-    var user = jwt.verify(req.cookies.session, process.env.JWT_SECRET);
-  
+
+    var user = await verifyToken(req.cookies.session);
 
 
 
-   
-   
-    
-    let coursescode=[],coursesname,assignmentarr;
-    
-        
-     coursescode = await courseAllot.find({ userID: user.teacherID, role: "Instructor" }) ;
 
 
-     coursesname = coursescode.length > 0 ? await course.find({
-         courseID: { $in: coursescode[0]["courseID"] }
-     }) : [];
 
 
-     assignmentarr = coursescode.length > 0 ? await assignment.find({
-         subjectCode: { $in: coursescode[0]["courseID"] }
-     }) : [];
-     
+    let coursescode = [], coursesname, assignmentarr;
+
+
+    coursescode = await courseAllot.find({ userID: user.teacherID, role: "Instructor" });
+
+
+    coursesname = coursescode.length > 0 ? await course.find({
+        courseID: { $in: coursescode[0]["courseID"] }
+    }) : [];
+
+
+    assignmentarr = coursescode.length > 0 ? await assignment.find({
+        subjectCode: { $in: coursescode[0]["courseID"] }
+    }) : [];
+
 
     res.render("teacherpage", { courses: coursesname, teacher: user, assignments: assignmentarr });
 
@@ -147,11 +159,11 @@ app.get("/teachers", async (req, res) => {
 
 })
 
-app.get("/course/:courseid",async(req,res)=>{
-    const courseID=req.params.courseidid;
+app.get("/course/:courseid", async (req, res) => {
+    const courseID = req.params.courseid;
 
 
-    const studentAllotments = await courseAllot.find({ courseID:{ $in: [courseID] }, role: "Student" });
+    const studentAllotments = await courseAllot.find({ courseID: { $in: [courseID] }, role: "Student" });
     const studentIDs = studentAllotments.map((allotment) => allotment.userID);
     const students = await student.find({ studentID: { $in: studentIDs } });
 
@@ -159,7 +171,7 @@ app.get("/course/:courseid",async(req,res)=>{
     const assignments = await assignmentModel.find({ subjectCode: courseID });
 
     // Fetch faculty for the course
-    const facultyAllotments = await courseAllot.find({ courseID:{ $in: [courseID] }, role: "Instructor" });
+    const facultyAllotments = await courseAllot.find({ courseID: { $in: [courseID] }, role: "Instructor" });
     res.render("courseDashboard", {
         courseName: courseDetails.courseName,
         students,
@@ -206,23 +218,23 @@ app.post("/course/create", upload.single("formFileSm"), async (req, res) => {
 
 
 
-app.get("/student",async (req,res)=>{
+app.get("/student", async (req, res) => {
 
-    var user = jwt.verify(req.cookies.session, process.env.JWT_SECRET);
+    var user = await verifyToken(req.cookies.session);
     let coursescode = [], coursesname, assignmentarr = [], submissionarr = [];
-    
+
     // Fetch courses for the student
     coursescode = await courseAllot.find({ userID: user.studentID, role: "Student" }) || [];
-    
+
     coursesname = coursescode.length > 0 ? await course.find({
         courseID: { $in: coursescode[0]["courseID"] }
     }) : [];
-    
+
     // Fetch all assignments related to the student's courses
     assignmentarr = coursescode.length > 0 ? await assignment.find({
         subjectCode: { $in: coursescode[0]["courseID"] }
     }) : [];
-    
+
     // Fetch all submissions for the student
     submissionarr = await submission.aggregate([
         {
@@ -244,32 +256,32 @@ app.get("/student",async (req,res)=>{
         },
         {
             $project: {
-                
-                assignmentID:1,
+
+                assignmentID: 1,
                 submissionID: 1, // Include the submission ID
                 graded: 1, // Include the grading status
                 submittedTime: 1, // Include the time when it was submitted
                 content: 1, // Include the content of the submission (path or content itself)
-                _id: 0 ,// Exclude the MongoDB _id field
+                _id: 0,// Exclude the MongoDB _id field
                 assignmentName: "$assignmentDetails.assignmentName"
-               
+
             }
         }
     ]);
-    
+
     // Extract assignmentIDs from the submission array
     const submittedAssignmentIDs = submissionarr.map(sub => sub.assignmentID);
-    
+
     // Filter the assignments array to exclude the submitted assignments (show only pending assignments)
     const pendingAssignments = assignmentarr.filter(assign =>
         !submittedAssignmentIDs.includes(assign.assignmentID)
     );
-    
+
     // Log the arrays for debugging (can be removed after testing)
     console.log('All Assignments:', assignmentarr);
     console.log('Submitted Assignments:', submissionarr);
     console.log('Pending Assignments:', pendingAssignments);
-    
+
     // Render the student page with all necessary data
     res.render("studentpage", {
         courses: coursesname,
@@ -277,8 +289,8 @@ app.get("/student",async (req,res)=>{
         pendingAssignments: pendingAssignments,
         submittedAssignments: submissionarr
     });
-    
-    
+
+
 })
 
 

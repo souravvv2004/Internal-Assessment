@@ -62,7 +62,7 @@ app.use("/send-reminder",reminder)
 
 
 app.listen(PORT, () => {
-  console.log("Url is ", url, "\n"),
+  console.log("Url is ", url ? "Connected" : "Not Connected", "\n"),
     console.log("Server running on localhost and Port", PORT);
 });
 
@@ -71,7 +71,7 @@ app.listen(PORT, () => {
 //                                              Listening on PORT
 //--------------------------------------------------------------------------------------------------------------------------------------
 // app.listen("::",PORT, () => {
-//   console.log("Url is ", url, "\n"),
+//   console.log("Url is ", url ? "Connected" : "Not Connected", "\n"),
 //     console.log("Server running on IPv6 and Port", PORT);
 // });
 

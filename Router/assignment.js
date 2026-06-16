@@ -10,7 +10,7 @@
 
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
+const { signToken, verifyToken } = require("../utils/jwt");
 const { courseAllot,course } = require("../Models/courseModel");
 const {assignment,submission}= require("../Models/assignment");
 const {student,teacher}=require("../Models/userModel");
@@ -67,7 +67,7 @@ async function userValidate(req, res, next) {
     console.log("...........User Reached..........\n");
     try {
         const { assignmentID } = req.params;
-        const user = jwt.verify(req.cookies.session, "SECRET");
+        const user = await verifyToken(req.cookies.session);
      
         let coursearr;
         if (user.teacherID && user.teacherID[0] === 'T') {
@@ -109,7 +109,7 @@ app.route("/:assignmentID")
 .get(userValidate, async (req, res) => {
 
 
-    let user = jwt.verify(req.cookies.session, "SECRET");
+    let user = await verifyToken(req.cookies.session);
     const assignmentInstance = await assignment.findOne({ assignmentID: req.params.assignmentID }) || {};
     const subject=await course.findOne({courseID:assignmentInstance.subjectCode}); 
     const subjectName=subject?`${assignmentInstance.subjectCode}:${subject["courseName"]}`:NULL;
@@ -266,7 +266,7 @@ app.post("/:assignmentID",upload.single("files"),async(req,res)=>{
     let submissionID=`S${assignmentInstance.assignmentID}:${numofprevsubmission.toString().padStart(3, '0')}`;
     let assignmentID=req.params.assignmentID;
    
-    let user = jwt.verify(req.cookies.session, "SECRET");
+    let user = await verifyToken(req.cookies.session);
     let submissonerID=user.studentID;
     let submittedTime=new Date();
     let content=req.file ? req.file.path : null;
