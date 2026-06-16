@@ -168,7 +168,7 @@ http://localhost:3000
 ## Security Features
 
 - Passwords stored as SHA-256 hashes
-- JWT tokens encrypted with AES-256-GCM (JWE) using the `jose` library — payload is unreadable even at jwt.io
+- JWT tokens encrypted using the `jose` library — payload is unreadable even at jwt.io
 - Cookies set with `httpOnly` and `secure` flags to prevent XSS
 - Token expiry set to 24 hours
 - Password reset links expire after 5 minutes
@@ -177,17 +177,3 @@ http://localhost:3000
 
 ---
 
-## Known Limitations
-
-- User ID generation uses `countDocuments()` which has a race condition under concurrent requests — production would use atomic counters or UUIDs
-- Multiple database calls on dashboard load could be optimized with `$lookup` aggregation pipelines
-- SHA-256 is used for password hashing — production should use `bcrypt` with salting
-
----
-
-## Author
-
-**Sourabh Madaan**  
-Academic Project — CSC-503
-
----
