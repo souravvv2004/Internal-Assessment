@@ -21,8 +21,8 @@ try{
     console.log("Course is ",submissionID)
     
     const user = await verifyToken(req.cookies.session);
-    if(user.studentID){
-        const courseAlloted=await courseAllot.find({userID:user.studentID,role:"Student"},{courseID:1,_id:0});
+    if(user.role === "Student"){
+        const courseAlloted=await courseAllot.find({userID:user.id,role:"Student"},{courseID:1,_id:0});
 
     if(courseAlloted[0]["courseID"].includes( submissionID )) {
         next();
@@ -34,7 +34,7 @@ try{
 
     }
     else {
-    const courseAlloted = await courseAllot.find( {userID:user.teacherID,role:"Instructor"} , {courseID:1,_id:0} );
+    const courseAlloted = await courseAllot.find( {userID:user.id,role:"Instructor"} , {courseID:1,_id:0} );
    
 
     if(courseAlloted[0]["courseID"].includes( submissionID )) {

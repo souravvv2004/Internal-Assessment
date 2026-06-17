@@ -138,7 +138,8 @@ app.get("/teachers", async (req, res) => {
     let coursescode = [], coursesname, assignmentarr;
 
 
-    coursescode = await courseAllot.find({ userID: user.teacherID, role: "Instructor" });
+    coursescode = await courseAllot.find({ userID: user.id, role: "Instructor" });
+
 
 
     coursesname = coursescode.length > 0 ? await course.find({
@@ -149,7 +150,8 @@ app.get("/teachers", async (req, res) => {
     assignmentarr = coursescode.length > 0 ? await assignment.find({
         subjectCode: { $in: coursescode[0]["courseID"] }
     }) : [];
-
+    console.log("Courses Alloted are ", coursesname);
+    console.log("Assignments are ", assignmentarr);
 
     res.render("teacherpage", { courses: coursesname, teacher: user, assignments: assignmentarr });
 
@@ -158,6 +160,7 @@ app.get("/teachers", async (req, res) => {
 
 
 })
+
 
 app.get("/course/:courseid", async (req, res) => {
     const courseID = req.params.courseid;
@@ -184,9 +187,10 @@ app.get("/course/:courseid", async (req, res) => {
 })
 
 app.post("/course/create", upload.single("formFileSm"), async (req, res) => {
+    var user = await verifyToken(req.cookies.session);
     const numofprevassignment = await assignment.countDocuments({ subjectCode: req.body.subjectCode }) + 1;
     console.log("Prev Assignment is ", numofprevassignment)
-
+    
 
     const assignmentID = "A" + req.body.subjectCode + ":" + `${numofprevassignment.toString().padStart(3, '0')}`;
     console.log("Assignment ID is ", assignmentID);
@@ -195,11 +199,10 @@ app.post("/course/create", upload.single("formFileSm"), async (req, res) => {
     delete req.body.formFileSm;
 
     const Assignment = new assignment({
-
         assignmentID,
         ...req.body,
+        createdBy: user.id,        
         assignmentPath: filePath
-
     });
 
     await Assignment.save();
@@ -224,7 +227,7 @@ app.get("/student", async (req, res) => {
     let coursescode = [], coursesname, assignmentarr = [], submissionarr = [];
 
     // Fetch courses for the student
-    coursescode = await courseAllot.find({ userID: user.studentID, role: "Student" }) || [];
+    coursescode = await courseAllot.find({ userID: user.id, role: "Student" }) || [];
 
     coursesname = coursescode.length > 0 ? await course.find({
         courseID: { $in: coursescode[0]["courseID"] }
@@ -238,7 +241,7 @@ app.get("/student", async (req, res) => {
     // Fetch all submissions for the student
     submissionarr = await submission.aggregate([
         {
-            $match: { submissonerID: user["studentID"] } // Match submissions for a specific student (submissonerID)
+            $match: { submissonerID: user["id"] } // Match submissions for a specific student (submissonerID)
         },
         {
             $lookup: {

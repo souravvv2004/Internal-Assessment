@@ -70,17 +70,17 @@ async function userValidate(req, res, next) {
         const user = await verifyToken(req.cookies.session);
      
         let coursearr;
-        if (user.teacherID && user.teacherID[0] === 'T') {
+        if (user.role === "Teacher") {
             coursearr = await courseAllot.findOne(
-                { userID: user.teacherID },
+                { userID: user.id },
                 { courseID: 1 }
             );
             
             coursearr=coursearr["courseID"];
             
-        } else if (user.studentID && user.studentID[0] === 'S') {
+        } else if (user.role === "Student") {
             coursearr = await courseAllot.findOne(
-                { userID: user.studentID },
+                { userID: user.id },
                 { courseID: 1 }
             );
             
@@ -116,7 +116,7 @@ app.route("/:assignmentID")
    
     const [isPast,timeRemaining]=calculateRemainingTime(assignmentInstance.endDate);
        
-        if(user.teacherID)
+        if(user.role === "Teacher")
        {
 
 
@@ -198,7 +198,7 @@ const enrolledStudentIDs = await courseAllot.find(
 //---------------------------------------------------------------For Student-----------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-else if(user.studentID){
+else if(user.role === "Student"){
 
     
         let assignmentInstance, submittedStudentsData, notSubmittedStudentsData;
@@ -208,7 +208,7 @@ else if(user.studentID){
 
         //Check any submission made by that user for this assignment
        
-        const submissioninstance=await submission.findOne({assignmentID:req.params.assignmentID,submissonerID:user.studentID})||null;
+        const submissioninstance=await submission.findOne({assignmentID:req.params.assignmentID,submissonerID:user.id})||null;
         console.log(submissioninstance);
        
 
@@ -240,7 +240,7 @@ else if(user.studentID){
                 assignment:assignmentInstance,
                 submissionStatus:true,
                 gradingStatus:submissioninstance.graded,
-                timeRemaining:` Assignment was submitted ${calculateRemainingTime(submissioninstance.submittedTime)} early`,
+                timeRemaining:` Assignment was submitted ${calculateRemainingTime(submissioninstance.submittedTime)[1]} early`,
                 lastModified:submissioninstance.submittedTime,
                 fileSubmission:submissioninstance.content
             })}
@@ -258,6 +258,10 @@ app.get("/uploads/:filename",async(req,res)=>{
 
 
 app.post("/:assignmentID",upload.single("files"),async(req,res)=>{
+
+    if (!req.file) {
+        return res.status(400).send("Please attach a file to submit");
+    }
     
     const assignmentInstance = await assignment.findOne({ assignmentID: req.params.assignmentID }) || {};
 
@@ -267,7 +271,7 @@ app.post("/:assignmentID",upload.single("files"),async(req,res)=>{
     let assignmentID=req.params.assignmentID;
    
     let user = await verifyToken(req.cookies.session);
-    let submissonerID=user.studentID;
+    let submissonerID=user.id;
     let submittedTime=new Date();
     let content=req.file ? req.file.path : null;
     const submissioninstance=new submission({
