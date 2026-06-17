@@ -14,6 +14,10 @@ app.use(cookieParser());
 
 const mongoose = require("mongoose");
 const path = require("path");
+const fs = require("fs");
+if (!fs.existsSync(path.join(__dirname, "uploads"))) {
+    fs.mkdirSync(path.join(__dirname, "uploads"));
+}
 const url = process.env.MONGODB_URI;
 
 app.use(express.static(path.join(__dirname, 'public')));
