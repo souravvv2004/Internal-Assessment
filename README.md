@@ -73,7 +73,77 @@ CSC-503/
 ├── index.js                # App entry point
 └── .env                    # Environment variables
 ```
+---
+## Architecture
+```
++------------------+
+                        |   Client Browser  |
+                        |  (Student/Teacher/|
+                        |      Admin)        |
+                        +---------+----------+
+                                  |
+                                  v
+                        +------------------+
+                        |    index.js       |
+                        |  Express app +    |
+                        |  session cookie    |
+                        +---------+----------+
+                                  |
+                                  v
+                        +------------------+
+                        |   utils/jwt.js    |
+                        |  verify session    |
+                        |  (JWE decrypt)      |
+                        +---------+----------+
+                                  |
+                                  v
+                        +------------------+
+                        |   Router layer    |
+                        |  role dispatch     |
+                        +--+----+----+----+--+
+                           |    |    |    |
+        +------------------+    |    |    +------------------+
+        |                       |    |                       |
+        v                       v    v                       v
++---------------+      +---------------+  +---------------+   +----------------+
+|   univ.js     |      |   login.js    |  | assignment.js |   | password-      |
+| create users  |      | auth, role    |  | course.js     |   | reset.js       |
+| courses,allot |      | dashboards    |  | submission.js |   | send-reminder  |
++-------+-------+      +-------+-------+  +-------+-------+   +--------+-------+
+        |                      |                  |                    |
+        +----------+-----------+------------------+--------------------+
+                    |
+                    v
+           +-----------------+
+           |    Models/      |
+           | userModel.js    |
+           | courseModel.js  |
+           | assignment.js   |
+           +--------+--------+
+                    |
+                    v
+           +-----------------+
+           |    MongoDB       |
+           |  (Mongoose)      |
+           +--------+--------+
+                    |
+                    v
+           +-----------------+
+           | Terminal/Client  |
+           |   JSON / EJS     |
+           |   page render    |
+           +-----------------+
 
+   Multer (uploads/)               Nodemailer (async)
+   +------------------+            +-------------------+
+   | assignment.js,    |            | univ.js --> welcome|
+   | submission.js     |            |   email w/ ID      |
+   | save file to disk |            | send-reminder.js   |
+   | store path in DB  |            |   --> reminder mail|
+   +------------------+            | password-reset.js  |
+                                     |   --> reset link    |
+                                     +-------------------+
+```
 ---
 
 ## Installation
