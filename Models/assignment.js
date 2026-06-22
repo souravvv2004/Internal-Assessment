@@ -7,7 +7,7 @@ const assignmentSchema=new mongo.Schema({
     assignmentName:{type:String,required:true},
     
     subjectCode:{type:String},
-    createdBy:{type:String,required:true ,required:true},
+    createdBy:{type:String,required:true },
     endDate:{type:Date},
     maxMarks:{type:Number},
     content:{type:String},

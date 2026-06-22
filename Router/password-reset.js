@@ -1,3 +1,12 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                      Function For handling Password Reset
+//                        @  Forgot Password (For Users)
+//                        @  Reset Password (For Users)
+//                        @  Email Sending (For Users)
+//
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 const express = require("express");
 const app = express();
 const nodemailer = require('nodemailer');
@@ -5,7 +14,7 @@ const {teacher,student} = require('../Models/userModel');
 const crypto = require("crypto");
 const email=process.env.Email;
 const PASSKEY=process.env.PASSKEY;
-// Email Details
+// Nodemailer transporter configured for Gmail SMTP, using credentials from env vars
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     host: 'smtp.gmail.com',
@@ -61,7 +70,7 @@ app.post("/", async (req, res) => {
     };
 
     // Expiration Time 
-    const expirationTime = Date.now() + 5 * 60 * 1000;
+    const expirationTime = Date.now() + 5 * 60 * 1000; // 5 minutes in milliseconds
     console.log("Expiration time is ",expirationTime);
 
     // Update in database
@@ -129,7 +138,7 @@ app.post("/reset", async (req, res) => {
         return res.status(400).send("Password must be at least 8 characters long");
     }
 
-    // Hash the new password and save it to the user
+      // Hash and store the new password, then invalidate the reset token so it's single-use
     
     user.Password = await generateHashToken(password1);
     user.token = null;

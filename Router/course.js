@@ -2,11 +2,12 @@ const express = require("express");
 const app = express();
 
 const {teacher,student,admin} = require("../Models/userModel");
-const multer = require("multer")
-const { signToken, verifyToken } = require("../utils/jwt")
 const { course, courseAllot } = require("../Models/courseModel");
 const { assignment, submission } = require("../Models/assignment")
-const crypto = require("crypto");
+
+
+
+
 app.get("/:courseID", async (req, res) => {
     try {
         const courseID = req.params.courseID;
@@ -19,7 +20,7 @@ app.get("/:courseID", async (req, res) => {
         }
 
         // Fetch students associated with the course
-        const studentAllotments = await courseAllot.find({ courseID: { $in: courseID }, role: "Student" });
+        const studentAllotments = await courseAllot.find({ courseID: { $in: [courseID] }, role: "Student" });
         console.log(studentAllotments);
         const studentIDs = studentAllotments.map((allotment) => allotment.userID);
         console.log(studentIDs)

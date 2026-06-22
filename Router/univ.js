@@ -1,5 +1,4 @@
 const express = require("express");
-const PORT = 8080;
 const router = express.Router();
 
 const {student,teacher}= require("../Models/userModel.js");
@@ -286,9 +285,10 @@ router.route("/courseAllot")
     console.log(subjectarr);
     
   
-    try{
-        await courseAllot.insertMany(subjectarr);
-    }
+   try {
+    await courseAllot.insertMany(subjectarr);
+    res.status(201).json({ message: "Courses allotted successfully" });
+}
     catch (error){
 
         if (error.code === 11000) {
@@ -302,7 +302,8 @@ router.route("/courseAllot")
         else{
 
             console.error('Error:', error);
-            alert("Error submitting courses.");}
+                res.status(500).json({ message: "Error submitting courses.", error: error.message });
+        }
 
         }
 

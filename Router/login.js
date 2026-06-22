@@ -59,7 +59,7 @@ app.route("/")
                 res.cookie("session", cookkieVal, {
                     httpOnly: true,
                     secure: true,
-                    maxAge: 24 * 60 * 60 * 1000
+                    maxAge: 24 * 60 * 60 * 1000 // 1 day
                 });
                 return res.redirect("login/teachers");
             }
@@ -82,7 +82,7 @@ app.route("/")
                                 res.cookie("session", cookkieVal, {
                     httpOnly: true,
                     secure: true,
-                    maxAge: 24 * 60 * 60 * 1000
+                    maxAge: 24 * 60 * 60 * 1000 // 1 day
                 });
                 return res.redirect("login/student");
             } else {
@@ -102,7 +102,7 @@ app.route("/")
                 res.cookie("session", cookkieVal, {
                     httpOnly: true,
                     secure: true,
-                    maxAge: 24 * 60 * 60 * 1000
+                    maxAge: 24 * 60 * 60 * 1000 // 1 day
                 });
 
                 return res.redirect("/univ");
@@ -127,7 +127,8 @@ app.route("/")
 
 app.get("/teachers", async (req, res) => {
 
-    var user = await verifyToken(req.cookies.session);
+    var tokenUser = await verifyToken(req.cookies.session);
+    var user = await teacher.findOne({ teacherID: tokenUser.id });
 
 
 
@@ -138,7 +139,7 @@ app.get("/teachers", async (req, res) => {
     let coursescode = [], coursesname, assignmentarr;
 
 
-    coursescode = await courseAllot.find({ userID: user.id, role: "Instructor" });
+    coursescode = await courseAllot.find({ userID: user.teacherID, role: "Instructor" });
 
 
 
@@ -164,27 +165,26 @@ app.get("/teachers", async (req, res) => {
 
 app.get("/course/:courseid", async (req, res) => {
     const courseID = req.params.courseid;
-
-
+    
+    const courseDetails = await course.findOne({ courseID });
+    
     const studentAllotments = await courseAllot.find({ courseID: { $in: [courseID] }, role: "Student" });
     const studentIDs = studentAllotments.map((allotment) => allotment.userID);
     const students = await student.find({ studentID: { $in: studentIDs } });
 
-    // Fetch assignments for the course
-    const assignments = await assignmentModel.find({ subjectCode: courseID });
+    const assignments = await assignment.find({ subjectCode: courseID });
 
-    // Fetch faculty for the course
     const facultyAllotments = await courseAllot.find({ courseID: { $in: [courseID] }, role: "Instructor" });
+    const facultyIDs = facultyAllotments.map((allotment) => allotment.userID);
+    const faculty = await teacher.find({ teacherID: { $in: facultyIDs } });
+
     res.render("courseDashboard", {
         courseName: courseDetails.courseName,
         students,
         assignments,
         faculty,
     });
-
-
-
-})
+});
 
 app.post("/course/create", upload.single("formFileSm"), async (req, res) => {
     var user = await verifyToken(req.cookies.session);
@@ -223,11 +223,12 @@ app.post("/course/create", upload.single("formFileSm"), async (req, res) => {
 
 app.get("/student", async (req, res) => {
 
-    var user = await verifyToken(req.cookies.session);
+    var tokenUser = await verifyToken(req.cookies.session);
+    var user = await student.findOne({ studentID: tokenUser.id });
     let coursescode = [], coursesname, assignmentarr = [], submissionarr = [];
 
     // Fetch courses for the student
-    coursescode = await courseAllot.find({ userID: user.id, role: "Student" }) || [];
+    coursescode = await courseAllot.find({ userID: user.studentID, role: "Student" }) || [];
 
     coursesname = coursescode.length > 0 ? await course.find({
         courseID: { $in: coursescode[0]["courseID"] }
@@ -241,7 +242,7 @@ app.get("/student", async (req, res) => {
     // Fetch all submissions for the student
     submissionarr = await submission.aggregate([
         {
-            $match: { submissonerID: user["id"] } // Match submissions for a specific student (submissonerID)
+            $match: { submissonerID: user["studentID"] } // Match submissions for a specific student (submissonerID)
         },
         {
             $lookup: {

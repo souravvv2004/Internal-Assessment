@@ -112,7 +112,7 @@ app.route("/:assignmentID")
     let user = await verifyToken(req.cookies.session);
     const assignmentInstance = await assignment.findOne({ assignmentID: req.params.assignmentID }) || {};
     const subject=await course.findOne({courseID:assignmentInstance.subjectCode}); 
-    const subjectName=subject?`${assignmentInstance.subjectCode}:${subject["courseName"]}`:NULL;
+    const subjectName=subject?`${assignmentInstance.subjectCode}:${subject["courseName"]}`:null;
    
     const [isPast,timeRemaining]=calculateRemainingTime(assignmentInstance.endDate);
        
@@ -250,7 +250,7 @@ else if(user.role === "Student"){
 
 app.get("/uploads/:filename",async(req,res)=>{
 
-    res.redirect(`/uploads/${req.params.filename}`)
+    res.download(path.join(__dirname, 'uploads', req.params.filename));
 
   
 
